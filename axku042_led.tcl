@@ -52,7 +52,12 @@ connect_bd_net [get_bd_ports PL_CLK0_P] [get_bd_pins clk_wiz_0/clk_in1_p]
 connect_bd_net [get_bd_ports PL_CLK0_N] [get_bd_pins clk_wiz_0/clk_in1_n]
 
 # Feed external resetn into clk_wiz resetn
-connect_bd_net [get_bd_ports ext_resetn] [get_bd_pins clk_wiz_0/resetn]
+# 1'b1 を生成する定数IP
+create_bd_cell -type ip -vlnv [latest_ip xlconstant] const_1
+set_property -dict [list CONFIG.CONST_WIDTH {1} CONFIG.CONST_VAL {1}] [get_bd_cells const_1]
+
+# clk_wiz の resetn に接続
+connect_bd_net [get_bd_pins const_1/dout] [get_bd_pins clk_wiz_0/resetn]
 
 # =========================
 # proc_sys_reset (recommended)
@@ -60,6 +65,7 @@ connect_bd_net [get_bd_ports ext_resetn] [get_bd_pins clk_wiz_0/resetn]
 create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_sys_0
 connect_bd_net [get_bd_pins clk_wiz_0/clk_out1] [get_bd_pins rst_sys_0/slowest_sync_clk]
 connect_bd_net [get_bd_ports ext_resetn]        [get_bd_pins rst_sys_0/ext_reset_in]
+connect_bd_net [get_bd_pins clk_wiz_0/locked] [get_bd_pins rst_sys_0/dcm_locked]
 
 # =========================
 # HLS IP: led_counter_1s
