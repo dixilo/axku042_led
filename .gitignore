@@ -1,0 +1,7 @@
+*.log
+*.jou
+*.str
+*~
+.Xil/
+axku042_led/
+hls/*/
